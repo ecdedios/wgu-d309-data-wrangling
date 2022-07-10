@@ -14593,16 +14593,14 @@ D309, WGU<br>
 <h3 id="Tweets-from-the-Twitter-API">Tweets from the Twitter API<a class="anchor-link" href="#Tweets-from-the-Twitter-API">&#182;</a></h3><p>This is the dataset that is scraped from the Twitter API (V2) using my own developer account. It was queried using the tweepy library and saved locally using json and to_csv(). It contains different stats for the tweets.</p>
 <h2 id="Asessing-the-Data">Asessing the Data<a class="anchor-link" href="#Asessing-the-Data">&#182;</a></h2><p>These are just some of the basics issues I've found with the datasets:</p>
 <h3 id="Quality-issues">Quality issues<a class="anchor-link" href="#Quality-issues">&#182;</a></h3><blockquote><ol>
-<li>"tweet_id" should be of data type object or string, not int64</li>
-<li>"in_reply_to_status_id" data type should be of data type object or string, not float64</li>
-<li>"in_reply_to_user_id" data type should be of data type object or string, not float 64</li>
-<li>"retweeted_status_id" data tyoe should be of data type object or string, not float64</li>
-<li>"retweeted_status_user_id" data type should be of data type object or string, not float64</li>
-<li>"timestamp" should of data type datetime instead of object</li>
-<li>"retweeted_status_timestamp" should be of data type datetime instead of object</li>
-<li>"img_num" in image_predictions_df should be of data type object or string, not int64</li>
+<li>"tweet_id", "in_reply_to_status_id", "in_reply_to_user_id", "retweeted_status_id", "retweeted_status_user_id" should be of data type string or object</li>
+<li>"timestamp" and "retweeted_status_timestamp" should be of data type datetime instead of object</li>
 <li>"source" in twitter_enhanced_df has irrelevant html characters</li>
-<li>"name", "doggo", "floofer", "pupper", and "puppo" in twitter_enhanced_df has None when it should be NaNs. Or, maybe it's better if "doggo", "floofer", "pupper", and "puppo" are of boolean data type</li>
+<li>nan's are not true nulls (NaN's)</li>
+<li>retweet records skew the data so they need to be removed</li>
+<li>img_num, p1, p2, p3, p1_conf, p2_conf, p3_conf, p1_dog, p2_dog, p3_dog column names are ambiguous or too vague</li>
+<li>p1, p2, p3 values are not standardized - some start with a capital letter while others do not</li>
+<li>"text" is uncleaned - need to be preprocessed using nlp techniques to garner some valuable insights</li>
 </ol>
 </blockquote>
 <h3 id="Tidiness-issues">Tidiness issues<a class="anchor-link" href="#Tidiness-issues">&#182;</a></h3><blockquote><ol>
@@ -14610,17 +14608,36 @@ D309, WGU<br>
 <li>all three dataframes should be combined into one master, single source of truth dataframe</li>
 </ol>
 </blockquote>
-<h3 id="Text-Data">Text Data<a class="anchor-link" href="#Text-Data">&#182;</a></h3><blockquote><p>The data needs to be cleaned and sanitized to produce quality insights using NLP or natural language processing techniques.</p>
-</blockquote>
 <h2 id="Cleaning-the-Data">Cleaning the Data<a class="anchor-link" href="#Cleaning-the-Data">&#182;</a></h2><p>Structural issues were the major drawbacks in the data so I resolved to deal with them first before taking care of the other issues.</p>
 <h3 id="Merging">Merging<a class="anchor-link" href="#Merging">&#182;</a></h3><p>I merged the three dataframes using merge().</p>
 <h3 id="Reverse-One-Hot-Encoding">Reverse One Hot Encoding<a class="anchor-link" href="#Reverse-One-Hot-Encoding">&#182;</a></h3><p>I recognized the stages were hot encoded somewhat (not with 0's and 1's) so I had to reverse the encoding using idmax. But first, I had to convert the string to 0's and 1's first.</p>
 <h3 id="Data-type-conversion">Data type conversion<a class="anchor-link" href="#Data-type-conversion">&#182;</a></h3><p>Converting the datatypes were easy. I wrote a function because I knew that I was going to be doing conversion repeatedly.</p>
-<h3 id="*-NLP---Natural-Language-Processing">* NLP - Natural Language Processing<a class="anchor-link" href="#*-NLP---Natural-Language-Processing">&#182;</a></h3><p>I performed basic cleaning of the text using NLTK and regex but the whole prefunctory and more effort is needed to get really good insights with the text data.</p>
+<h3 id="Regex">Regex<a class="anchor-link" href="#Regex">&#182;</a></h3><p>I used a few regex patterns to extract relevant information from the columns while shedding some unwanted characters in the strings.</p>
+<h3 id="True-Nulls">True Nulls<a class="anchor-link" href="#True-Nulls">&#182;</a></h3><p>I replace pseudo nulls ("nan") with true nulls (NaN &amp; NaT)</p>
+<h3 id="Removal-of-Duplicates">Removal of Duplicates<a class="anchor-link" href="#Removal-of-Duplicates">&#182;</a></h3><p>I removed records that are retweets because they act as duplicates of the original tweets and will skew the data.</p>
+<h3 id="Non-descriptive-Column-Names">Non-descriptive Column Names<a class="anchor-link" href="#Non-descriptive-Column-Names">&#182;</a></h3><p>I renamed columns to be more descriptive to avoid confusion.</p>
+<h3 id="Standardization">Standardization<a class="anchor-link" href="#Standardization">&#182;</a></h3><p>I made sure that all the prediction values are lowercase to aid in analysis later.</p>
+<h3 id="NLP---Natural-Language-Processing">NLP - Natural Language Processing<a class="anchor-link" href="#NLP---Natural-Language-Processing">&#182;</a></h3><p>I performed basic cleaning of the text using NLTK and regex but the whole prefunctory and more effort is needed to get really good insights with the text data.</p>
 
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
 </div>
 </body>
 
